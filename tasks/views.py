@@ -2,7 +2,7 @@ from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView,
 from .models import Task
 from .serializers import TaskSerializer
 from rest_framework.permissions import IsAuthenticated
-from .permissions import IsOwnerOrReadOnly
+from .permissions import IsOwnerOrStaffOrReadOnly
 from rest_framework.pagination import PageNumberPagination
 
 
@@ -13,17 +13,16 @@ class Pagination(PageNumberPagination):
 
 class CreateTaskApp(CreateAPIView):
     serializer_class = TaskSerializer
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
 
-    permission_classes = (IsAuthenticated,)
-
 
 class DetailUpdateDeleteTaskApi(RetrieveUpdateDestroyAPIView):
-    queryset = Task.objects.all()
     serializer_class = TaskSerializer
-    permission_classes = (IsAuthenticated, IsOwnerOrReadOnly)
+    permission_classes = (IsAuthenticated, IsOwnerOrStaffOrReadOnly)
+    queryset = Task.objects.all()
 
 
 class ListAllTasksApi(ListAPIView):
